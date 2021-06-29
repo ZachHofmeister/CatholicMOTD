@@ -1,0 +1,24 @@
+name: CatholicMOTD
+main: com.zachhof.catholicmotd.Messager
+version: 1.2
+api-version: 1.16
+author: Graywolf212
+commands:
+  catholic:
+    description: Displays the Catholic message-of-the-day that appears on login!
+    usage: /<command>
+    aliases: motd
+  calendar:
+    description: Displays information from the daily liturgial calendar
+    usage: /<command>
+    aliases: cal
+  verse:
+    description: Displays the verse of the day
+    usage: /<command>
+  catechism:
+    description: Displays the daily catechism passage
+    usage: /<command>
+    aliases: cate
+  # quiz:
+  #   description: Take a quiz on a previous daily verse or a random verse
+  #   usage: /<command> (daily|random)
