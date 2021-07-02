@@ -71,7 +71,36 @@ public class Calendar {
 			) formatted += "the ";
 			formatted += c.title + ".\n";
 		}
-		return formatted.trim();
+		return formatted.trim() + ChatColor.RESET;
+	}
+	
+	public ChatColor color() {
+		return color(season.toLowerCase());
+	}
+	
+	private ChatColor color(String color) {
+		ChatColor col = ChatColor.DARK_GREEN;
+		switch(color.toLowerCase()) {
+			case "christmas":
+			case "easter":
+			case "white":
+				col = ChatColor.WHITE;
+				break;
+			case "red":
+				col = ChatColor.DARK_RED;
+				break;
+			case "advent":
+			case "lent":
+			case "violet":
+				col = ChatColor.DARK_PURPLE;
+				break;
+			case "ordinary":
+			case "green":
+			default:
+				col = ChatColor.DARK_GREEN;
+				break;
+		}
+		return col;
 	}
 	
 	//STATICS
@@ -96,44 +125,5 @@ public class Calendar {
 		Gson gson = new Gson();
 		Calendar info = gson.fromJson(json, Calendar.class);
 		return info;
-	}
-
-	public static ChatColor color(String color) {
-		ChatColor col = ChatColor.DARK_GREEN;
-		switch(color.toLowerCase()) {
-			case "white":
-				col = ChatColor.WHITE;
-				break;
-			case "red":
-				col = ChatColor.DARK_RED;
-				break;
-			case "violet":
-				col = ChatColor.DARK_PURPLE;
-				break;
-			case "green":
-			default:
-				col = ChatColor.DARK_GREEN;
-				break;
-		}
-		return col;
-	}
-
-	public static ChatColor seasonColor(String season) {
-		ChatColor col = ChatColor.DARK_GREEN;
-		switch(season.toLowerCase()) {
-			case "advent":
-			case "lent":
-				col = ChatColor.DARK_PURPLE;
-				break;
-			case "christmas":
-			case "easter":
-				col = ChatColor.WHITE;
-				break;
-			case "ordinary":
-			default:
-				col = ChatColor.DARK_GREEN;
-				break;
-		}
-		return col;
 	}
 }

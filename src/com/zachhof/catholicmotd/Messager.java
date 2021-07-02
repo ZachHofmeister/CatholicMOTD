@@ -28,13 +28,18 @@ public class Messager extends JavaPlugin implements Listener {
 	@Override
 	public void onEnable() {
 		//Configs
-		config.addDefault("motd_on_every_join", false);
-		config.addDefault("calendar_enabled", true);
-		config.addDefault("verse_enabled", true);
-		config.addDefault("verse_color", "YELLOW");
-		config.addDefault("bible_version", "RSVCE");
-		config.addDefault("catechism_enabled", true);
-		config.addDefault("catechism_color", "AQUA");
+		//LINK FOR COLOR CODES!! https://www.digminecraft.com/lists/color_list_pc.php
+		config.addDefault("motd_template",
+				  "%greeting%\n"
+				+ "%calendar%\n"
+				+ "Verse of the day:\n"
+				+ "%verse%\n"
+				+ "Catechism passage of the day:\n"
+				+ "%catechism%");
+		config.addDefault("rejoin_template", "%greeting%");
+		config.addDefault("verse_cmd_color", "§6");
+		config.addDefault("bible_version", "RSVCE"); //TODO, I want to make this works before releasing 1.3
+		config.addDefault("catechism_cmd_color", "§b");
 		config.addDefault("catechism_max_length", 200);
 		config.options().copyDefaults(true);
 		saveConfig();
@@ -50,10 +55,7 @@ public class Messager extends JavaPlugin implements Listener {
 		dailyCal = Calendar.getDailyCalendar();
 		dailyVerse = getDailyVerse();
 		dailyCatechism = getRandomCatechism();
-		getLogger().info(dailyCal.displayFormat());
-		getLogger().info(ChatColor.valueOf(config.getString("verse_color")) + dailyVerse);
-		getLogger().info(ChatColor.valueOf(config.getString("catechism_color")) + dailyCatechism);
-		//debugDump(365);
+		getLogger().info(buildMOTD("console", config.getString("motd_template")));
 	}
 	
 	//Fired when plugin is disabled
@@ -69,89 +71,70 @@ public class Messager extends JavaPlugin implements Listener {
 			dailyCal = Calendar.getDailyCalendar();
 			dailyVerse = getDailyVerse();
 			dailyCatechism = getRandomCatechism();
+			playersJoined.clear();
 		}
 		
-		//Send message
-		sendGreeting(player);
 		//Send motd (if first join or always)
-		if (config.getBoolean("motd_on_every_join") || isPlayerFirstLogin(player.getName())) sendMOTD(player);
-		
-		//Record player login
-		if (isPlayerFirstLogin(player.getName())) playersJoined.add(player.getName());
+		if (isPlayerFirstLogin(player.getName())) {
+			sendMOTD(player);
+			playersJoined.add(player.getName());
+		} else 
+			sendRejoinMessage(player);
 	}
 	
-	public void sendGreeting(Player player) {
-		final String message = new String(buildGreeting(player.getName(), dailyCal.season));
+	public void sendMessage(Player player, String message) {
+		final String finalMessage = new String(message);
 		getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() { //Sends message after join message
 			@Override
 			public void run() {
-				player.sendMessage(message);
+				player.sendMessage(finalMessage);
 			}
         }, 2);
 	}
 	
 	public void sendMOTD(Player player) {
-		if (config.getBoolean("calendar_enabled")) sendCalendar(player); //Send calendar (if enabled)
-		if (config.getBoolean("verse_enabled")) sendVerse(player, "Verse of the day:\n"); //Send verse (if enabled)
-		if (config.getBoolean("catechism_enabled")) sendCatechism(player, "Catechism passage of the day:\n");
+		sendMessage(player, buildMOTD(player.getName(), config.getString("motd_template")));
+	}
+	
+	public void sendRejoinMessage(Player player) {
+		sendMessage(player, buildMOTD(player.getName(), config.getString("rejoin_template")));
 	}
 	
 	public void sendCalendar(Player player) {
-		final String message = new String(dailyCal.displayFormat());
-		getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() { //Sends message after join message
-			@Override
-			public void run() {
-				player.sendMessage(message);
-			}
-        }, 2);
+		sendMessage(player, dailyCal.displayFormat());
 	}
 	
-	public void sendVerse(Player player) { sendVerse(player, ""); }
-	public void sendVerse(Player player, String prefix) {
-		final String message = new String(ChatColor.valueOf(config.getString("verse_color")) + prefix + dailyVerse);
-		getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() { //Sends message after join message
-			@Override
-			public void run() {
-				player.sendMessage(message);
-			}
-        }, 2);
+	public void sendVerse(Player player) {
+		String color = config.getString("verse_cmd_color").replaceAll("%seasonColor%", dailyCal.color().toString());
+		sendMessage(player, color + dailyVerse);
 	}
 	
-	public void sendCatechism(Player player) { sendCatechism(player, ""); }
-	public void sendCatechism(Player player, String prefix) {
-		final String message = new String(ChatColor.valueOf(config.getString("catechism_color")) + prefix + dailyCatechism);
-		getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() { //Sends message after join message
-			@Override
-			public void run() {
-				player.sendMessage(message);
-			}
-        }, 2);
+	public void sendCatechism(Player player) {
+		String color = config.getString("catechism_cmd_color").replaceAll("%seasonColor%", dailyCal.color().toString());
+		sendMessage(player, color + dailyCatechism);
+	}
+	
+	public String buildMOTD(String playerName, String messageTemplate) {
+		String message = config.getString("motd_template");
+		message = message.replaceAll("(?i)%greeting%", buildGreeting(playerName, dailyCal.season));
+		message = message.replaceAll("(?i)%player%", playerName);
+		message = message.replaceAll("(?i)%calendar%", dailyCal.displayFormat());
+		message = message.replaceAll("(?i)%verse%", dailyVerse);
+		message = message.replaceAll("(?i)%catechism%", dailyCatechism);
+		message = message.replaceAll("(?i)%seasonColor%", dailyCal.color().toString());
+		return message;
 	}
 	
 	public String buildGreeting(String playerName, String season) {
 		String greeting = "";
 		if (season.equalsIgnoreCase("christmas")) {
-			greeting = ChatColor.RED + "Merry " + ChatColor.GREEN + "Christmas " + Calendar.seasonColor(season) + playerName + "!";
-		} else if(season.equalsIgnoreCase("easter")) {
-			greeting = Calendar.seasonColor(season) + "Happy Easter " + playerName + "! Christ is risen!";
+			greeting = ChatColor.RED + "Merry " + ChatColor.GREEN + "Christmas " + dailyCal.color() + playerName + "!";
+		} else if (season.equalsIgnoreCase("easter")) {
+			greeting = dailyCal.color() + "Happy Easter " + playerName + "! Christ is risen!";
 		} else {
-			greeting = Calendar.seasonColor(season) + "Welcome " + playerName + "!";
+			greeting = dailyCal.color() + "Welcome " + playerName + "!";
 		}
-		return greeting.trim();
-	}
-	
-	public boolean isPlayerFirstLogin(String name) { //Could replace this with a map or something for O(1) search?
-		boolean first = true;
-		for (String n : playersJoined) {
-			if (name.equals(n)) first = false;
-		}
-		return first;
-	}
-	
-	public static String getCurrentDateString(String pattern) {
-		DateTimeFormatter dtf = DateTimeFormatter.ofPattern(pattern);  
-		LocalDateTime now = LocalDateTime.now();
-		return dtf.format(now);
+		return greeting.trim() + ChatColor.RESET;
 	}
 	
 	public String getDailyVerse() {
@@ -196,31 +179,17 @@ public class Messager extends JavaPlugin implements Listener {
 		return passage;
 	}
 	
-//	public void debugDump(int days) {
-//		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd");  
-//		LocalDateTime now = LocalDateTime.now();
-//		for (int i = 0; i < days; ++i) {
-//			String json = "";
-//			try {
-//				URL calendar = new URL("http://calapi.inadiutorium.cz/api/v0/en/calendars/default/" + dtf.format(now));
-//		        BufferedReader in = new BufferedReader(
-//		        new InputStreamReader(calendar.openStream()));
-//		        
-//		        String inputLine;
-//		        while ((inputLine = in.readLine()) != null) json += inputLine;
-//		        in.close();
-//			} catch (Exception ex) {
-//				getLogger().warning("Exception thrown from function getRawCalendar: " + ex.getMessage());
-//			}
-//			Gson gson = new Gson();
-//			CalendarInfo info = gson.fromJson(json, CalendarInfo.class);
-//			String message = "";
-//			
-//			//Greeting
-//			message += playerGreeting("TestPlayer212", info.season);
-//			message += formatCalendar(info);
-//			getLogger().info(message);
-//			now = now.plusDays(1L);
-//		}
-//	}
+	public boolean isPlayerFirstLogin(String name) { //Could replace this with a map or something for O(1) search?
+		boolean first = true;
+		for (String n : playersJoined) {
+			if (name.equals(n)) first = false;
+		}
+		return first;
+	}
+	
+	public static String getCurrentDateString(String pattern) {
+		DateTimeFormatter dtf = DateTimeFormatter.ofPattern(pattern);  
+		LocalDateTime now = LocalDateTime.now();
+		return dtf.format(now);
+	}
 }
