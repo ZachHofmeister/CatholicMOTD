@@ -32,9 +32,9 @@ public class Messager extends JavaPlugin implements Listener {
 		config.addDefault("motd_template",
 				  "%greeting%\n"
 				+ "%calendar%\n"
-				+ "Verse of the day:\n"
+				+ "§6Verse of the day:\n"
 				+ "%verse%\n"
-				+ "Catechism passage of the day:\n"
+				+ "§bCatechism passage of the day:\n"
 				+ "%catechism%");
 		config.addDefault("rejoin_template", "%greeting%");
 		config.addDefault("verse_cmd_color", "§6");
@@ -78,8 +78,9 @@ public class Messager extends JavaPlugin implements Listener {
 		if (isPlayerFirstLogin(player.getName())) {
 			sendMOTD(player);
 			playersJoined.add(player.getName());
-		} else 
+		} else {
 			sendRejoinMessage(player);
+		}
 	}
 	
 	public void sendMessage(Player player, String message) {
@@ -115,7 +116,7 @@ public class Messager extends JavaPlugin implements Listener {
 	}
 	
 	public String buildMOTD(String playerName, String messageTemplate) {
-		String message = config.getString("motd_template");
+		String message = messageTemplate;
 		message = message.replaceAll("(?i)%greeting%", buildGreeting(playerName, dailyCal.season));
 		message = message.replaceAll("(?i)%player%", playerName);
 		message = message.replaceAll("(?i)%calendar%", dailyCal.displayFormat());
@@ -152,7 +153,10 @@ public class Messager extends JavaPlugin implements Listener {
 		Elements passages = doc.select("div.rp-passage"); //Verses
 		for (Element passage : passages) {
 			for (Element child : passage.selectFirst("div.rp-passage-text").getAllElements()) {
-				if (child.is("sup.versenum, span.chapternum, div.footnotes, sup.footnote, h1, h2, h3, h4, h5")) {
+				if (child.is("sup.versenum, span.chapternum, div.footnotes, sup.footnote,"
+						+ "h1, h2, h3, h4, h5, .crossrefs, .hidden, .crossreference,"
+						+ ".inline-h1, .inline-h2, .inline-h3, .inline-h4, .inline-h5") 
+						&& !child.is(".poetry")) {
 					child.remove();
 				}
 			}
