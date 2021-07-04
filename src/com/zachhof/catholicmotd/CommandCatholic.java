@@ -14,10 +14,15 @@ public class CommandCatholic implements CommandExecutor {
 	
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-		if (sender instanceof Player) {
-            Player player = (Player) sender;
-            mainMessager.sendMOTD(player);
-        }
+		if (args.length != 0 && args[0].equalsIgnoreCase("reload")) {
+			mainMessager.reloadConfigFile();
+		}
+		else {
+			if (sender instanceof Player) {
+	            Player player = (Player) sender;
+	            mainMessager.sendMOTD(player);
+	        }
+		}
         return true; // If the player (or console) uses our command correct, we can return true
 	}
 

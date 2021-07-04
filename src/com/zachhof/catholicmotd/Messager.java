@@ -38,7 +38,7 @@ public class Messager extends JavaPlugin implements Listener {
 				+ "%catechism%");
 		config.addDefault("rejoin_template", "%greeting%");
 		config.addDefault("verse_cmd_color", "§6");
-		config.addDefault("bible_version", "RSVCE"); //TODO, I want to make this works before releasing 1.3
+		config.addDefault("bible_version", "RSVCE");
 		config.addDefault("catechism_cmd_color", "§b");
 		config.addDefault("catechism_max_length", 200);
 		config.options().copyDefaults(true);
@@ -106,12 +106,12 @@ public class Messager extends JavaPlugin implements Listener {
 	}
 	
 	public void sendVerse(Player player) {
-		String color = config.getString("verse_cmd_color").replaceAll("%seasonColor%", dailyCal.color().toString());
+		String color = config.getString("verse_cmd_color").replaceAll("(?i)%seasonColor%", dailyCal.color().toString());
 		sendMessage(player, color + dailyVerse);
 	}
 	
 	public void sendCatechism(Player player) {
-		String color = config.getString("catechism_cmd_color").replaceAll("%seasonColor%", dailyCal.color().toString());
+		String color = config.getString("catechism_cmd_color").replaceAll("(?i)%seasonColor%", dailyCal.color().toString());
 		sendMessage(player, color + dailyCatechism);
 	}
 	
@@ -195,5 +195,10 @@ public class Messager extends JavaPlugin implements Listener {
 		DateTimeFormatter dtf = DateTimeFormatter.ofPattern(pattern);  
 		LocalDateTime now = LocalDateTime.now();
 		return dtf.format(now);
+	}
+	
+	public void reloadConfigFile() {
+		reloadConfig();
+		config = getConfig();
 	}
 }
