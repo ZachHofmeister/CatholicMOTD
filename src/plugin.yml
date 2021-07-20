@@ -1,7 +1,7 @@
 name: CatholicMOTD
 main: com.zachhof.catholicmotd.Messager
 version: 1.3.2
-# api-version: 1.17
+api-version: 1.16
 author: Graywolf212
 commands:
   catholic:
