@@ -48,6 +48,7 @@ public class Messager extends JavaPlugin implements Listener {
         this.getCommand("calendar").setExecutor(new CommandCalendar(this));
         this.getCommand("verse").setExecutor(new CommandVerse(this));
         this.getCommand("catechism").setExecutor(new CommandCatechism(this));
+        this.getCommand("reloadCatConfig").setExecutor(new CommandReload(this));
         //this.getCommand("quiz").setExecutor(new CommandQuiz(this));
 		//Enable class
 		getServer().getPluginManager().registerEvents(this, this);

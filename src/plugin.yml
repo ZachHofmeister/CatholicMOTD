@@ -1,7 +1,7 @@
 name: CatholicMOTD
 main: com.zachhof.catholicmotd.Messager
-version: 1.3.1
-api-version: 1.17
+version: 1.3.2
+# api-version: 1.17
 author: Graywolf212
 commands:
   catholic:
@@ -17,6 +17,16 @@ commands:
   catechism:
     description: Displays daily catechism passage
     usage: /<command>
+  reloadCatConfig:
+    description: Reloads CatholicMOTD config file.
+    usage: /<command>
+    permission: CatholicMOTD.reload
+    permission-message: You do not have permission to do that!
+permissions:
+  CatholicMOTD.reload:
+   description: Allows the reloadCatConfig command.
+   default: op
+
   # quiz:
   #   description: Take a quiz on a previous daily verse or a random verse
   #   usage: /<command> (daily|random)

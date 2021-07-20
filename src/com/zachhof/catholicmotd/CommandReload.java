@@ -3,21 +3,17 @@ package com.zachhof.catholicmotd;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
-public class CommandCatholic implements CommandExecutor {
+public class CommandReload implements CommandExecutor {
 	Messager mainMessager;
 	
-	public CommandCatholic(Messager messager) {
+	public CommandReload(Messager messager) {
 		mainMessager = messager;
 	}
 	
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-		if (sender instanceof Player) {
-            Player player = (Player) sender;
-            mainMessager.sendMOTD(player);
-        }
+		mainMessager.reloadConfigFile();
         return true; // If the player (or console) uses our command correct, we can return true
 	}
 
