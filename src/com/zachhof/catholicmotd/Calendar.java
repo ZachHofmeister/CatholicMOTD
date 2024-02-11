@@ -19,6 +19,8 @@ import com.google.gson.Gson;
 //	"rank_num":3.13}
 //	],
 //"weekday":"friday"}
+
+//TODO: add case to say "the solemnity of *THE* Blessed Virgin Mary"
 public class Calendar {
 	public String date;
 	public String season;
@@ -37,7 +39,7 @@ public class Calendar {
 		String formatted = "";
 		//Celebrations
 		for(Celebration c : this.celebrations) {
-			if (c.title.equalsIgnoreCase("The Memorial of the Blessed Virgin Mary on Saturday")) continue;
+//			if (c.title.equalsIgnoreCase("The Memorial of the Blessed Virgin Mary on Saturday")) continue;
 			formatted += color(c.colour);
 			switch(c.rank.toLowerCase()) {
 				case "optional memorial":
@@ -63,12 +65,14 @@ public class Calendar {
 			}
 			if (c.title.startsWith("Chair")
 				|| c.title.startsWith("Presentation")
-				|| c.title.startsWith("Holy")
+//				|| c.title.startsWith("Holy")
 				|| c.title.startsWith("Dedication")
 				|| c.title.startsWith("Guardian")
 				|| c.title.startsWith("Triumph")
 				|| Character.isDigit(c.title.charAt(0))
 			) formatted += "the ";
+			//add "of" to strings like "22nd December"
+			c.title = c.title.replaceAll("(\\d+\\w\\w )(December)", "$1of $2");
 			formatted += c.title + ".\n";
 		}
 		return formatted.trim() + ChatColor.RESET;
@@ -107,6 +111,9 @@ public class Calendar {
 	public static Calendar getDailyCalendar() {
 		//Get the date
 		String date = Messager.getCurrentDateString("yyyy/MM/dd");
+		return getDailyCalendar(date);
+	}
+	public static Calendar getDailyCalendar(String date) {
 		//Fetch JSON from calapi
 		String json = "";
 		try {

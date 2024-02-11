@@ -54,8 +54,12 @@ public class Messager extends JavaPlugin implements Listener {
 		getServer().getPluginManager().registerEvents(this, this);
 		//Logs the daily calendar and verse
 		dailyCal = Calendar.getDailyCalendar();
-		dailyVerse = getDailyVerse();
-		dailyCatechism = getRandomCatechism();
+		try {
+			dailyVerse = getDailyVerse(config.getString("bible_version"));
+			dailyCatechism = getRandomCatechism(config.getInt("catechism_max_length"));
+		} catch (IOException ex) {
+			getLogger().warning("Exception thrown: " + ex.getStackTrace());
+		}
 		getLogger().info(buildMOTD("console", config.getString("motd_template")));
 	}
 	
@@ -70,8 +74,12 @@ public class Messager extends JavaPlugin implements Listener {
 		//Refresh calendar and verse if it's a new day
 		if (!dailyCal.date.equals(getCurrentDateString("yyyy-MM-dd"))) {
 			dailyCal = Calendar.getDailyCalendar();
-			dailyVerse = getDailyVerse();
-			dailyCatechism = getRandomCatechism();
+			try {
+				dailyVerse = getDailyVerse(config.getString("bible_version"));
+				dailyCatechism = getRandomCatechism(config.getInt("catechism_max_length"));
+			} catch (IOException ex) {
+				getLogger().warning("Exception thrown: " + ex.getStackTrace());
+			}
 			playersJoined.clear();
 		}
 		
@@ -139,16 +147,20 @@ public class Messager extends JavaPlugin implements Listener {
 		return greeting.trim() + ChatColor.RESET;
 	}
 	
-	public String getDailyVerse() {
+	public static String getDailyVerse(String bibleVersion) throws IOException {
 		//Get the date
 		String date = getCurrentDateString("yyyy/MM/dd");
+		return getDailyVerse(bibleVersion, date);
+	}
+	
+	public static String getDailyVerse(String bibleVersion, String date) throws IOException {
 		//Fetch webpage from biblegateway via Jsoup
 		Document doc = null;
 		try {
-			String url = "https://www.biblegateway.com/reading-plans/verse-of-the-day/" + date + "?version=" + config.getString("bible_version");
+			String url = "https://www.biblegateway.com/reading-plans/verse-of-the-day/" + date + "?version=" + bibleVersion;
 			doc = Jsoup.connect(url).get();
 		} catch (IOException ex) {
-			getLogger().warning("Exception thrown from function getDailyVerse: " + ex.getMessage());
+			throw ex;
 		}
 		String output = "";
 		Elements passages = doc.select("div.rp-passage"); //Verses
@@ -167,7 +179,7 @@ public class Messager extends JavaPlugin implements Listener {
 		return output.trim();
 	}
 	
-	public String getRandomCatechism() {
+	public static String getRandomCatechism(int maxLength) throws IOException {
 		String url = "https://www.catholicculture.org/culture/library/catechism/randomcatechism.cfm";
 		//Fetch webpage from catholicculture.org via Jsoup
 		Document doc = null;
@@ -176,12 +188,12 @@ public class Messager extends JavaPlugin implements Listener {
 			do { //Loop to ensure that passage is within the desired length.
 				doc = Jsoup.connect(url).get();
 				passage = doc.selectFirst("div.content_wrapper").selectFirst("p").text();
-			} while (passage.length() > config.getInt("catechism_max_length"));
+			} while (passage.length() > maxLength);
 		} catch (IOException ex) {
-			System.out.println("Exception thrown from function getRandomCatechism: " + ex.getMessage());
+			throw ex;
 		}
 		
-		return passage;
+		return passage; //NOTE: if there is an exception in the above after the website has worked once, a really long passage may be returned here because an exception breaks the loop.
 	}
 	
 	public boolean isPlayerFirstLogin(String name) { //Could replace this with a map or something for O(1) search?
@@ -193,8 +205,12 @@ public class Messager extends JavaPlugin implements Listener {
 	}
 	
 	public static String getCurrentDateString(String pattern) {
+		return getCurrentDateString(pattern, 0);
+	}
+	
+	public static String getCurrentDateString(String pattern, int offset) {
 		DateTimeFormatter dtf = DateTimeFormatter.ofPattern(pattern);  
-		LocalDateTime now = LocalDateTime.now();
+		LocalDateTime now = LocalDateTime.now().plusDays(offset);
 		return dtf.format(now);
 	}
 	
