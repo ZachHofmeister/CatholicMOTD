@@ -5,8 +5,8 @@ import java.io.IOException;
 public class Testing {
 	public static void main(String[] args) {
 		System.out.println("Starting test...");
-		int calRange[] = {-60, 360};
-		int verseRange[] = {-60, 60};
+		int[] calRange = {0, 60};
+//		int[] verseRange = {-60, 60};
 		try {
 			//calendar
 			for (int i = calRange[0]; i < calRange[1]; ++i) {
