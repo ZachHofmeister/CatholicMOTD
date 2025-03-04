@@ -2,6 +2,8 @@
 
 This plugin gives each player a Catholic message-of-the-day on login, with the goal of encouraging spiritual reflection and exposing the beauty of Catholic tradition.
 
+![Example screenshot showcasing Minecraft server login Message of the Day](example.png)
+
 ## Current Features
 Liturgical season information complete with corresponding colors (for instance, purple during Lent and Advent)
 Information about current memorials, feast days, and solemnities
