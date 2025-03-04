@@ -5,19 +5,21 @@ This plugin gives each player a Catholic message-of-the-day on login, with the g
 ![Example screenshot showcasing Minecraft server login Message of the Day](example.png)
 
 ## Current Features
-Liturgical season information complete with corresponding colors (for instance, purple during Lent and Advent)
-Information about current memorials, feast days, and solemnities
-Bible verse of the day
-Random Catechism passage of the day
+- Liturgical season information complete with corresponding colors (for instance, purple during Lent and Advent)
+- Information about current memorials, feast days, and solemnities
+- Bible verse of the day
+- Random Catechism passage of the day
 
 
 ## Commands
-/catholic or /motd: Displays the full MOTD again.
-/calendar: Displays the information about the liturgical day / season.
-/verse: Displays the daily Bible verse.
-/catechism: Displays the daily Catechism passage.
-Installation
-Just put the .jar file into your server's plugins folder and restart your server.
+- /catholic or /motd: Displays the full MOTD again.
+- /calendar: Displays the information about the liturgical day / season.
+- /verse: Displays the daily Bible verse.
+- /catechism: Displays the daily Catechism passage.
+
+## Installation
+- Download latest version from releases or CurseForge
+- Put the .jar file into your server's plugins folder and restart your server.
 
 ## Configuration
 Below are the options you can configure with a description on how to use them:
@@ -46,10 +48,10 @@ Below are the options you can configure with a description on how to use them:
 ## Feedback / Planned Features
 Here are some of the features I hope to add soon!
 
-- --More supported Bible versions-- Done in version 1.3!
+- ~~More supported Bible versions~~ Done in version 1.3!
 - Daily prayer
 - Daily saint quote
 - Configurable incentives for reading daily info
 If you have any suggestions for features, I would be happy to consider them! Please leave a comment below
 
-I hope you enjoy this plugin! Peace be with you! 🙏🏼
+Enjoy, and peace be with you! 🙏🏼
